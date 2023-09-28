@@ -48,6 +48,7 @@ api.post("/create/user", (req, res) => {
 });
 
 api.post("/create/product", (req, res) => {
+  console.log(req.body);
   const { name, description } = req.body;
 
   if (!name || !description) {
