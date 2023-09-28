@@ -94,7 +94,7 @@ publicApi.put("/update/product/:id", (event) => {
 });
 
 
-publicApi.put("/update/product/goodstag/:goodstagId", (event) => {
+publicApi.put("/update/products/goodstag/:goodstagId", (event) => {
   const { goodstagId } = event.params;
   const { name, description } = event.request.body();
 
