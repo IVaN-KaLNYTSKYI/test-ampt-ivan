@@ -123,5 +123,6 @@ api.get("/products/goodstag", (req, res) => {
   return res.status(200).send({ products: dataStore.productGoodsTag });
 });
 app.use("/api", api);
+http.useNodeHandler(app);
 
 http.node.use(app);
