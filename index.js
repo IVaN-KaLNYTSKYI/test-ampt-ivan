@@ -33,84 +33,92 @@ publicApi.post("/submit", async (event) => {
   });
 });
 
-publicApi.post("/create/user", (event) => {
-  const { name, email } = event.request.body();
+publicApi.post("/create/user", async (event) => {
+  const {name, email} = await event.request.body();
 
   if (!name || !email) {
-    return event.status(400).body({ message: "Name and email are required fields!" });
+    return event.status(400).body({message: "Name and email are required fields!"});
   }
 
-  const newUser = { name, email };
+  const newUser = {name, email};
   dataStore.users.push(newUser);
 
-  return event.status(201).body({ message: "User created successfully", user: newUser });
+  return event.status(201).body({message: "User created successfully", user: newUser});
 });
 
-publicApi.post("/create/product", (event) => {
-  console.log(event.request.body());
-  const { name, description } = event.request.body();
+publicApi.post("/create/product", async (event) => {
+
+  const {name, description} = await event.request.body();
 
   if (!name || !description) {
-    return event.status(400).body({ message: "Name and description are required fields!" });
+    return event.status(400).body({message: "Name and description are required fields!"});
   }
 
   const productId = uuidv4(); // Генеруємо унікальний ідентифікатор
-  const newProduct = { id: productId, name, description }; // Додаємо ідентифікатор до продукту
+  const newProduct = {id: productId, name, description}; // Додаємо ідентифікатор до продукту
   dataStore.products.push(newProduct);
 
-  return event.status(201).body({ message: "Product created successfully", product: newProduct });
+  return event.status(201).body({message: "Product created successfully", product: newProduct});
 });
 
-publicApi.post("/create/product/goodstag", (event) => {
-  const { productId } = event.request.body();
+publicApi.post("/create/product/goodstag", async (event) => {
+  const {productId} = await event.request.body();
 
-  const product = dataStore.products.find(value => value.id===productId)
+  const product = dataStore.products.find(value => value.id === productId)
 
   const productIdGoodsTag = uuidv4();
-  const newProduct = { idGoodsTag: productIdGoodsTag, name:product.name, description:product.description,idProductDatabase:productId }; // Додаємо ідентифікатор до продукту
+  const newProduct = {
+    idGoodsTag: productIdGoodsTag,
+    name: product.name,
+    description: product.description,
+    idProductDatabase: productId
+  }; // Додаємо ідентифікатор до продукту
   dataStore.productGoodsTag.push(newProduct);
 
-  return event.status(201).body({ message: "Product in goodstag created successfully", product: newProduct });
+  return event.status(201).body({message: "Product in goodstag created successfully", product: newProduct});
 });
 
 
-publicApi.put("/update/product/:id", (event) => {
-  const { id } = event.params;
-  const { name, description } = event.request.body();
+publicApi.put("/update/product/:id", async (event) => {
+  const {id} = event.params;
+  const {name, description} = await event.request.body();
 
   if (!name || !description) {
-    return event.status(400).body({ message: "Name and description are required fields!" });
+    return event.status(400).body({message: "Name and description are required fields!"});
   }
 
   const productIndex = dataStore.products.findIndex(product => product.id === id);
 
   if (productIndex === -1) {
-    return event.status(201).body({ message: "Product not found" });
+    return event.status(201).body({message: "Product not found"});
   }
 
-  dataStore.products[productIndex] = { ...dataStore.products[productIndex], name, description };
+  dataStore.products[productIndex] = {...dataStore.products[productIndex], name, description};
 
-  return event.status(200).body({ message: "Product updated successfully", product: dataStore.products[productIndex] });
+  return event.status(200).body({message: "Product updated successfully", product: dataStore.products[productIndex]});
 });
 
 
-publicApi.put("/update/products/goodstag/:goodstagId", (event) => {
-  const { goodstagId } = event.params;
-  const { name, description } = event.request.body();
+publicApi.put("/update/products/goodstag/:goodstagId", async (event) => {
+  const {goodstagId} = event.params;
+  const {name, description} = await event.request.body();
 
   if (!name || !description) {
-    return event.status(400).body({ message: "Name and description are required fields!" });
+    return event.status(400).body({message: "Name and description are required fields!"});
   }
 
   const productIndex = dataStore.products.findIndex(product => product.idProductDatabase === goodstagId);
 
   if (productIndex === -1) {
-    return event.status(404).body({ message: "Product not found" });
+    return event.status(404).body({message: "Product not found"});
   }
 
-  dataStore.products[productIndex] = { ...dataStore.products[productIndex], name, description };
+  dataStore.products[productIndex] = {...dataStore.products[productIndex], name, description};
 
-  return event.status(200).body({ message: "Product in goodstag updated successfully", product: dataStore.products[productIndex] });
+  return event.status(200).body({
+    message: "Product in goodstag updated successfully",
+    product: dataStore.products[productIndex]
+  });
 });
 
 
