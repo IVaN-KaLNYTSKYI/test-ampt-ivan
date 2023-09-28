@@ -107,17 +107,17 @@ publicApi.put("/update/products/goodstag/:goodstagId", async (event) => {
     return event.status(400).body({message: "Name and description are required fields!"});
   }
 
-  const productIndex = dataStore.products.findIndex(product => product.idProductDatabase === goodstagId);
+  const productIndex = dataStore.productGoodsTag.findIndex(product => product.idProductDatabase === goodstagId);
 
   if (productIndex === -1) {
     return event.status(404).body({message: "Product not found"});
   }
 
-  dataStore.products[productIndex] = {...dataStore.products[productIndex], name, description};
+  dataStore.productGoodsTag[productIndex] = {...dataStore.productGoodsTag[productIndex], name, description};
 
   return event.status(200).body({
     message: "Product in goodstag updated successfully",
-    product: dataStore.products[productIndex]
+    product: dataStore.productGoodsTag[productIndex]
   });
 });
 
@@ -127,7 +127,7 @@ publicApi.get("/products", (event) => {
 });
 
 publicApi.get("/products/goodstag", (event) => {
-  return event.status(200).body({ products: dataStore.productGoodsTag });
+  return event.status(200).body({ productsGoodsTag: dataStore.productGoodsTag });
 });
 http.useNodeHandler(app);
 
