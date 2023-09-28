@@ -1,69 +1,68 @@
 import { http } from "@ampt/sdk";
 import express, { Router } from "express";
+import { api } from "@ampt/api";
 import { v4 as uuidv4 } from "uuid";
 const app = express();
-
-const api = Router();
 
 const dataStore = {
   users: [],
   products: [],
   productGoodsTag:[],
 };
+const publicApi = api("public").router("/api");
 
-
-api.get("/hello", (req, res) => {
-  return res.status(200).send({ message: "Hello from the public api!" });
+publicApi.get("/hello", (event) => {
+  return event.status(200).body({ message: "Hello from the public api!" });
 });
 
-api.get("/greet/:name", (req, res) => {
-  const { name } = req.params;
+publicApi.post("/greet/:name", (event) => {
+  const { name } = event.params;
 
   if (!name) {
-    return res.status(400).send({ message: "Missing route param for `name`!" });
+    return event.status(400).body({ message: "Missing route param for `name`!" });
   }
 
   return res.status(200).send({ message: `Hello ${name}!` });
 });
 
-api.post("/submit", async (req, res) => {
+publicApi.post("/submit", async (event) => {
 
-  return res.status(200).send({
-    body: req.body,
+  return event.status(200).body({
+    body: event.request.body(),
     message: "You just posted data",
   });
 });
 
-api.post("/create/user", (req, res) => {
-  const { name, email } = req.body;
+publicApi.post("/create/user", (event) => {
+  const { name, email } = event.request.body();
 
   if (!name || !email) {
-    return res.status(400).send({ message: "Name and email are required fields!" });
+    return event.status(400).body({ message: "Name and email are required fields!" });
   }
 
   const newUser = { name, email };
   dataStore.users.push(newUser);
 
-  return res.status(201).send({ message: "User created successfully", user: newUser });
+  return event.status(201).body({ message: "User created successfully", user: newUser });
 });
 
-api.post("/create/product", (req, res) => {
-  console.log(req);
-  const { name, description } = req.body;
+publicApi.post("/create/product", (event) => {
+  console.log(event.request.body());
+  const { name, description } = event.request.body();
 
   if (!name || !description) {
-    return res.status(400).send({ message: "Name and description are required fields!" });
+    return event.status(400).body({ message: "Name and description are required fields!" });
   }
 
   const productId = uuidv4(); // Генеруємо унікальний ідентифікатор
   const newProduct = { id: productId, name, description }; // Додаємо ідентифікатор до продукту
   dataStore.products.push(newProduct);
 
-  return res.status(201).send({ message: "Product created successfully", product: newProduct });
+  return event.status(201).body({ message: "Product created successfully", product: newProduct });
 });
 
-api.post("/create/product/goodstag", (req, res) => {
-  const { productId } = req.body;
+publicApi.post("/create/product/goodstag", (event) => {
+  const { productId } = event.request.body();
 
   const product = dataStore.products.find(value => value.id===productId)
 
@@ -71,58 +70,57 @@ api.post("/create/product/goodstag", (req, res) => {
   const newProduct = { idGoodsTag: productIdGoodsTag, name:product.name, description:product.description,idProductDatabase:productId }; // Додаємо ідентифікатор до продукту
   dataStore.productGoodsTag.push(newProduct);
 
-  return res.status(201).send({ message: "Product in goodstag created successfully", product: newProduct });
+  return event.status(201).body({ message: "Product in goodstag created successfully", product: newProduct });
 });
 
 
-api.put("/update/product/:id", (req, res) => {
-  const { id } = req.params;
-  const { name, description } = req.body;
+publicApi.put("/update/product/:id", (event) => {
+  const { id } = event.params;
+  const { name, description } = event.request.body();
 
   if (!name || !description) {
-    return res.status(400).send({ message: "Name and description are required fields!" });
+    return event.status(400).body({ message: "Name and description are required fields!" });
   }
 
   const productIndex = dataStore.products.findIndex(product => product.id === id);
 
   if (productIndex === -1) {
-    return res.status(404).send({ message: "Product not found" });
+    return event.status(201).body({ message: "Product not found" });
   }
 
   dataStore.products[productIndex] = { ...dataStore.products[productIndex], name, description };
 
-  return res.status(200).send({ message: "Product updated successfully", product: dataStore.products[productIndex] });
+  return event.status(200).body({ message: "Product updated successfully", product: dataStore.products[productIndex] });
 });
 
 
-api.put("/update/product/goodstag/:id", (req, res) => {
-  const { id } = req.params;
-  const { name, description } = req.body;
+publicApi.put("/update/product/goodstag/:id", (event) => {
+  const { id } = event.params;
+  const { name, description } = event.request.body();
 
   if (!name || !description) {
-    return res.status(400).send({ message: "Name and description are required fields!" });
+    return event.status(400).body({ message: "Name and description are required fields!" });
   }
 
   const productIndex = dataStore.products.findIndex(product => product.idProductDatabase === id);
 
   if (productIndex === -1) {
-    return res.status(404).send({ message: "Product not found" });
+    return event.status(404).body({ message: "Product not found" });
   }
 
   dataStore.products[productIndex] = { ...dataStore.products[productIndex], name, description };
 
-  return res.status(200).send({ message: "Product in goodstag updated successfully", product: dataStore.products[productIndex] });
+  return event.status(200).body({ message: "Product in goodstag updated successfully", product: dataStore.products[productIndex] });
 });
 
 
-api.get("/products", (req, res) => {
-  return res.status(200).send({ products: dataStore.products });
+publicApi.get("/products", (event) => {
+  return event.status(200).body({ products: dataStore.products });
 });
 
-api.get("/products/goodstag", (req, res) => {
-  return res.status(200).send({ products: dataStore.productGoodsTag });
+publicApi.get("/products/goodstag", (event) => {
+  return event.status(200).body({ products: dataStore.productGoodsTag });
 });
-app.use("/api", api);
 http.useNodeHandler(app);
 
 http.node.use(app);

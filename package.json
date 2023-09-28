@@ -11,7 +11,8 @@
   "dependencies": {
     "@ampt/sdk": "latest",
     "express": "^4.18.2",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "@ampt/api":"^0.0.1-beta.10"
   },
   "ampt": {
     "app": "test-ampt-ivan",
