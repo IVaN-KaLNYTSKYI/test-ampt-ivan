@@ -94,15 +94,15 @@ publicApi.put("/update/product/:id", (event) => {
 });
 
 
-publicApi.put("/update/product/goodstag/:id", (event) => {
-  const { id } = event.params;
+publicApi.put("/update/product/goodstag/:goodstagId", (event) => {
+  const { goodstagId } = event.params;
   const { name, description } = event.request.body();
 
   if (!name || !description) {
     return event.status(400).body({ message: "Name and description are required fields!" });
   }
 
-  const productIndex = dataStore.products.findIndex(product => product.idProductDatabase === id);
+  const productIndex = dataStore.products.findIndex(product => product.idProductDatabase === goodstagId);
 
   if (productIndex === -1) {
     return event.status(404).body({ message: "Product not found" });
